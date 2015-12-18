@@ -1,0 +1,40 @@
+{
+  "name": "gulp-breezy",
+  "version": "1.0.0",
+  "description": "Declare Gulp tasks fast.",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Temoto-kun/gulp-breezy.git"
+  },
+  "keywords": [
+    "Gulp",
+    "tasks",
+    "dependencies",
+    "workflow"
+  ],
+  "author": "Temoto-kun <kiiroifuriku@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Temoto-kun/gulp-breezy/issues"
+  },
+  "homepage": "https://github.com/Temoto-kun/gulp-breezy#readme",
+  "jscsConfig": {
+    "preset": "crockford",
+    "fileExtensions": [
+      ".js"
+    ],
+    "disallowTrailingWhitespace": false,
+    "maxErrors": null
+  },
+  "dependencies": {
+    "gulp": "^3.9.0"
+  },
+  "devDependencies": {
+    "gulp-jasmine": "^2.2.1",
+    "jasmine": "^2.4.1"
+  }
+}
