@@ -34,7 +34,7 @@
             }
         },
 
-        defineNonCallbackTask = function (name, opts, cb) {
+        defineTask = function (name, opts, cb) {
             var task;
 
             opts = require('./lib/options')(opts);
@@ -45,8 +45,8 @@
             return task;
         },
 
-        defineCallbackTask = function (name, opts) {
-            return defineNonCallbackTask(name, {}, opts);
+        defineDefaultOptsTask = function (name, cb) {
+            return defineTask(name, {}, cb);
         };
 
     breezy = function breezy(name, opts, cb) {
@@ -71,10 +71,10 @@
         }
 
         if (!(opts instanceof Function)) {
-            return defineNonCallbackTask(name, opts, cb);
+            return defineTask(name, opts, cb);
         }
 
-        return defineCallbackTask(name, opts);
+        return defineDefaultOptsTask(name, opts);
     };
 
     breezy.getDefaultTasks = function () {

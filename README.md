@@ -16,7 +16,7 @@ breezy('compile',
         watch: true,
 
         // Declare as a dependency of `default` task. This is `true` by default.
-        default: true
+        'default': true,
 
         // Breezy does the pipeline for you, as long as you specify the modules
         // to be used, as well as its options:
