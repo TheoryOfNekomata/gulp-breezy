@@ -3,8 +3,9 @@
 Declare Gulp tasks fast.
 
 ```js
-var concat = require('gulp-concat')
-    breezy = require('gulp-breezy');
+var concat = require('gulp-concat'),
+    breezy = require('gulp-breezy'),
+    sourcemaps = require('gulp-sourcemaps');
 
 breezy('compile',
     {
@@ -36,16 +37,17 @@ breezy('compile',
     }, function cb() { /* ... */ }
 );
 
-// ....
+// ...
 
 breezy('default', breezy.getDefaultTasks());
 
-breezy('watch', ['default'], function () {
-    breezy.getWatchParams().forEach(function (watchPair) {
-        gulp.watch(watchPair.src, watchPair.name);
-    });
-});
+// Easily create watcher tasks with optional dependencies
+breezy.createWatcherTask('watch', ['default']);
 ```
+
+## Todo
+
+- [ ] Add plumber for `breezy.createWatcherTask()`
 
 ## License
 
