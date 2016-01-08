@@ -22,19 +22,36 @@
             });
         },
 
-        checkIfDefined = function checkIfDefined(taskNames) {
+        getUndefinedTasks = function getUndefinedTasks(taskNames) {
             if (!(taskNames instanceof Array)) {
                 taskNames = [taskNames];
             }
 
-            return taskNames.reduce(function (current, next) {
-                return current && next;
-            }, true);
+            return taskNames.filter(function (taskName) {
+                return !isTaskDefined(taskName);
+            });
         },
 
         applyTaskOptions = function applyTaskOptions(name, opts) {
-            if (!checkIfDefined(opts.deps)) {
-                throw new Error('Dependency ' + name + ' is not yet defined');
+            var undefinedTasks, deps;
+
+            undefinedTasks = getUndefinedTasks(opts.deps);
+
+            if (undefinedTasks.length > 0) {
+                deps = undefinedTasks.slice(-1).map(function (depName) {
+                    return '[' + depName + ']';
+                }).join(', ') + (
+                    undefinedTasks.length > 1 ? (
+                        ', and ' +
+                        '[' + opts.deps.slice(opts.deps.length - 1) + ']'
+                    ) : ''
+                );
+
+                throw new Error(
+                    deps +
+                    (undefinedTasks.length > 1 ? ' are' : ' is') +
+                    ' not yet defined'
+                );
             }
 
             // opts.default should be strictly boolean
@@ -116,6 +133,10 @@
         }
 
         return defineDefaultOptsTask(name, opts);
+    };
+
+    breezy.getDefinedTasks = function getDefinedTasks() {
+        return Object.keys(isTaskDefault);
     };
 
     breezy.getDefaultTasks = getDefaultTasks;

@@ -2,11 +2,7 @@
     var gulp = require('gulp');
 
     describe('Registering', function () {
-        var breezy;
-
-        beforeEach(function () {
-            breezy = require('./../index');
-        });
+        var breezy = require('./../index');
 
         it('should work for an implicit default task', function () {
             breezy('task1', function () {});
@@ -26,32 +22,25 @@
             expect(breezy.getDefaultTasks()).not.toContain('task3');
         });
 
-        it('should work with a watched source glob', function () {
-            var watchParams;
+        it('should be able to reflect to list of defined tasks', function () {
+            var definedTasks = breezy.getDefinedTasks();
 
-            breezy('task4', { src: './../**/*.js', watch: true });
-            breezy('task5', { src: './sass/**/*.scss', watch: true });
-            breezy('task6', { src: './sass/**/*.scss', watch: true });
+            expect(definedTasks).toContain('task1');
+            expect(definedTasks).toContain('task2');
+            expect(definedTasks).toContain('task3');
+            expect(definedTasks).not.toContain('task4');
 
-            watchParams = breezy.getWatchParams();
+            breezy('task4', { 'default': true });
+            definedTasks = breezy.getDefinedTasks();
 
-            expect(watchParams.filter(function (param) {
-                return param.task === 'task3';
-            }).length).toBe(0);
-
-            expect(watchParams.filter(function (param) {
-                return param.task === 'task4';
-            }).length).toBe(1);
-
-            expect(watchParams.filter(function (param) {
-                return param.src === './sass/**/*.scss';
-            }).length).toBe(2);
+            expect(definedTasks).toContain('task4');
+            expect(breezy.getDefaultTasks()).toContain('task4');
         });
 
         it('should work with dependency task(s)', function () {
             expect(function () {
                 breezy('task7', 'task1');
-                breezy('task8', ['task7', 'task5', 'task2']);
+                breezy('task8', ['task7', 'task3', 'task2']);
             }).not.toThrow();
         });
 
