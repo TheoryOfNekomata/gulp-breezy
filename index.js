@@ -2,6 +2,7 @@
     var breezy,
         isTaskDefault = {},
         watchParams = [],
+        gulp = require('gulp'),
 
         defineIfDefault = function defineIfDefault(name, isDefault) {
             isTaskDefault[name] = isDefault;
@@ -21,12 +22,20 @@
             });
         },
 
-        checkTaskOptions = function checkTaskOptions(name, opts) {
-            opts.deps.forEach(function (dep) {
-                if (!isTaskDefined(dep)) {
-                    throw new Error('Dependency ' + name + ' is not yet defined');
-                }
-            });
+        checkIfDefined = function checkIfDefined(taskNames) {
+            if (!(taskNames instanceof Array)) {
+                taskNames = [taskNames];
+            }
+
+            return taskNames.reduce(function (current, next) {
+                return current && next;
+            }, true);
+        },
+
+        applyTaskOptions = function applyTaskOptions(name, opts) {
+            if (!checkIfDefined(opts.deps)) {
+                throw new Error('Dependency ' + name + ' is not yet defined');
+            }
 
             // opts.default should be strictly boolean
             if (typeof opts.default !== 'boolean') {
@@ -46,7 +55,7 @@
             opts = require('./lib/options')(opts);
             task = require('./lib/task')(name, opts, cb);
 
-            checkTaskOptions(name, opts);
+            applyTaskOptions(name, opts);
 
             return task;
         },
@@ -55,30 +64,32 @@
             return defineTask(name, {}, cb);
         },
 
+        defaultWatchFunction = function defaultWatchFunction() {
+            watchParams.forEach(function (watchPair) {
+                if (!watchPair.src || !watchPair.task) {
+                    throw new Error(
+                        'Source glob and task name should be specified. ' +
+                        '(src: ' + watchPair.src + ', task: ' +
+                        watchPair.task + ')'
+                    )
+                }
+
+                if (!(watchPair.src instanceof Array)) {
+                    watchPair.src = [watchPair.src];
+                }
+
+                if (!(watchPair.task instanceof Array)) {
+                    watchPair.task = [watchPair.task];
+                }
+
+                // default gulp watch
+                // TODO add gulp-plumber?
+                gulp.watch(watchPair.src, watchPair.task);
+            });
+        },
+
         createWatcherTask = function createWatcherTask(name, deps) {
-            var gulp = require('gulp');
-
-            gulp.task(name || 'watch', deps || [], function () {
-                watchParams.forEach(function (watchPair) {
-                    if (!watchPair.src || !watchPair.task) {
-                        throw new Error(
-                            'Source glob and task name should be specified. ' +
-                            '(src: ' + watchPair.src + ', task: ' +
-                            watchPair.task + ')'
-                        )
-                    }
-
-                    if (!(watchPair.src instanceof Array)) {
-                        watchPair.src = [watchPair.src];
-                    }
-
-                    if (!(watchPair.task instanceof Array)) {
-                        watchPair.task = [watchPair.task];
-                    }
-
-                    gulp.watch(watchPair.src, watchPair.task);
-                });
-            })
+            gulp.task(name || 'watch', deps || [], defaultWatchFunction);
         };
 
     breezy = function breezy(name, opts, cb) {
